@@ -1,0 +1,81 @@
+from itertools import product
+
+settings = DisplaySettings()
+settings.prime = 2
+settings.xscale = 1
+settings.yscale = 2
+settings.xmin = -50
+settings.xmax = 50
+settings.ymin = 0
+settings.ymax = 30
+settings.xgridstep = 5
+settings.ygridstep = 5
+settings.T_max = 100
+settings.x_full_range = True
+settings.page_list = [0,5,9,17,33,65]
+
+s = initialize(settings)
+
+classes = {}
+variables = ["a1", "a2", "b", "v"]
+bmax = 80  
+vmin = -100
+vmax = 150
+
+
+for v in range(vmin,vmax):
+    for b in range(0,bmax):
+        s.set_shift(-26*b + 6*v,2*b)
+        color = ['black', 'blue','green'][ v % 3 ]
+        classes[(0,0,b,v)] = s.addClass(0,0).setName(monomialString(variables,(0,0,b,v))).setColor(color)
+        classes[(1,0,b,v)] = s.addClass(3,1).setName(monomialString(variables,(1,0,b,v))).setColor(color)
+        #s.addStructline()
+        classes[(0,1,b,v)] = s.addClass(7,1).setName(monomialString(variables,(0,1,b,v))).setColor(color)
+        #s.addStructline(classes[(0,0,b,v)])
+        classes[(1,1,b,v)] = s.addClass(10,2).setName(monomialString(variables,(1,1,b,v))).setColor(color)
+        s.addStructlineSquare()
+        
+for (k, v) in classes.items():
+    v.key = k
+    
+
+
+# d5(v) = a1 b^2 v^{9}
+for v in range(vmin,vmax-8):
+    for (a2,b) in product([0,1],range(0,bmax-2)):
+        if (v )%3 != 0:
+            s.addDifferential(classes[(0,a2,b,v)],classes[(1,a2,b+2,v+8)],5)
+            
+# d9(a1 v^2) = d1 b^5 v^{24}
+for v in range((vmin)/3*3+2,vmax-22,3):
+    for (a2,b) in product([0,1],range(0,bmax-5)):
+        s.addDifferential(classes[(1,a2,b,v)],classes[(0,a2,b+5,v+22)],9) 
+        
+# d17(v^3) = a2 b^{16} Delta^{71}
+for v in range((vmin)/3*3+3,vmax-33,3):
+    if( (v - 3*b) % 9 != 0):
+        for b in range(0,bmax-16):
+            d = s.addDifferential(classes[(0,0,b,v)],classes[(0,1,b+8,v+33)],17)
+            #s.extra_info = str(d)
+
+## d65(a2 v^6) = b^{33} Delta^{-114}
+#for v in range(-3,30,9): 
+#    if( v % 9 != 0):
+#        for (a1,b) in product(range(0,2),range(0,bmax-33)):
+#            d = s.addDifferential(classes[(a1,1,b,v)],classes[(a1,0,b+33,v-120)],65)
+#            s.extra_info = str(d)
+
+
+#for c in sseq.getClasses():
+#    c.visible = False
+##    
+#for (v,a1,a2,b) in product(range(4,-50,-1), range(0,2), range(0,1), range(0,10)):
+#   classes[a1,0,b,v].visible = True
+
+
+#    b = ( c.page == 5  or c.page == 9)
+#    b = b or (classes[((1-c.key[0]),) + c.key[1:]].page == 5)   
+#    #k = (c.key[0], c.key[1] + 1) + c.key[2:]
+#    #b = b or (k in classes and classes[k].page == 5)
+#    if not b:
+#        c.visible = False

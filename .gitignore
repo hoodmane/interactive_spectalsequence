@@ -1,0 +1,6 @@
+jython
+pip
+*.aux
+*.log
+*synctex*
+*.class

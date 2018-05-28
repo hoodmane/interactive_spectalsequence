@@ -1,0 +1,12 @@
+classes = {}
+for v in range(-10,10):
+    classes[(v,0)] = addClass(4*v,0).setShape('Z').setName("v^"+str(v))
+    for e in range(1,50):
+        classes[(v,e)] = addClass(4*v+e,e).setName( "v^" + str(v) + "e^" + str(e))
+        addStructline(classes[(v,e-1)],classes[(v,e)])
+
+
+for v in range(-9,10,2):
+    for e in range(0,40):
+        addDifferential(classes[(v,e)],classes[(v-1,e+3)],3)
+        
