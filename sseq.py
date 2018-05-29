@@ -1,7 +1,7 @@
 #!./jython
 import sys
-#sys.path.append('..\\resolution\\resolution.jar')
-sys.path.append('resolution\\resolution.jar')
+import os
+sys.path.append(os.path.join('resolution', 'resolution.jar'))
 
 from sseq_class_defs import *
 import code

@@ -1,6 +1,8 @@
 import sys
+import os
 from collections import deque
-sys.path.append('..\\resolution\\resolution.jar')
+sys.path.append(os.path.join('resolution', 'resolution.jar'))
+
 
 #from res.Main import * 
 from res.frontend import *
