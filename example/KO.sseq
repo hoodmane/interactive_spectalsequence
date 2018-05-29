@@ -1,3 +1,6 @@
+settings = getSettingsObject()
+s = initialize(settings)
+
 classes = {}
 for v in range(-10,10):
     classes[(v,0)] = addClass(4*v,0).setShape('Z').setName("v^"+str(v))

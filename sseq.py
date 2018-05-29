@@ -1,6 +1,7 @@
 #!./jython
 import sys
 import os
+#sys.path.append("..\\resolution\\resolution.jar")
 sys.path.append(os.path.join('resolution', 'resolution.jar'))
 
 from sseq_class_defs import *
@@ -25,11 +26,16 @@ def initialize(settings):
     sseq = Sseq()
     startDisplay = SpectralSequenceDisplay.constructFrontend(sseq,settings).start
     return sseq
+    
+def getSettingsObject():
+    settings = DisplaySettings()
+    settings.windowName = "Interactive Spectral Sequences"
+    return settings
 
 if(len(sys.argv) > 1):
     exec(open(sys.argv[1],"r").read())
 else:
-    settings = DisplaySettings()
+    settings = getSettingsObject()
     settings.prime = 2
     settings.xscale = 1
     settings.yscale = 2

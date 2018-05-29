@@ -1,4 +1,4 @@
-settings = DisplaySettings()
+settings = getSettingsObject()
 settings.prime = 2
 settings.xscale = 1
 settings.yscale = 2
@@ -10,7 +10,6 @@ settings.xgridstep = 5
 settings.ygridstep = 5
 settings.T_max = 100
 settings.x_full_range = True
-settings.page_list = [0,5,9,13,]
 
 s = initialize(settings)
 
