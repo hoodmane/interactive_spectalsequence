@@ -1,22 +1,18 @@
 import sys
 import os
 from collections import deque
-#sys.path.append("..\\resolution\\resolution.jar")
+sys.path.append("..\\resolution\\resolution.jar")
 sys.path.append(os.path.join('resolution', 'resolution.jar'))
 
+from style import *
+from sseq_class import *
+from sseq_edges import *
 
-#from res.Main import * 
 from res.frontend import *
 from res.spectralsequencediagram import *
-from res.spectralsequencediagram import DisplaySettings
-from com.google.gson import *
 
 from java.awt import Color, Shape
 from java.awt.geom import Ellipse2D, Rectangle2D
-
-color_dict = {'black' : Color.BLACK, 'blue' : Color.BLUE, 'green' : Color.GREEN, 'red' : Color.RED }
-shape_dict = { 'Z' : Rectangle2D.Double( 0, 0, 12, 12) }
-style_dict = { 'Z' : { 'shape' : 'Z' }, 'Z/2' : { 'shape' : 'Z/2' } }
 
 infinity = 10000
 
@@ -24,8 +20,6 @@ def addToDictionaryOfLists(dictionary, key,value):
     if key not in dictionary:
         dictionary[key] = []
     dictionary[key].append(value)
-
-
 
 class Sseq(SpectralSequence):
    def __init__(self):
@@ -41,6 +35,15 @@ class Sseq(SpectralSequence):
         self.yshift = 0
         self.last_classes = deque([],4)
         self.page_list = [0,infinity]
+        self.default_style = PyStyle()
+   
+   def setDefaultStyle(self,style):
+        if type(style) is str:
+            if style not in style_dict:
+                print("Unknown style %s, ignoring it")
+            style = style_dict[style]
+        self.default_style  = style
+        return self
    
    def set_shift(self,x,y):
         self.xshift = x
@@ -55,7 +58,7 @@ class Sseq(SpectralSequence):
    def addClass(self,x,y):
         x = x + self.xshift
         y = y + self.yshift
-        the_sseq_class = PySseqClass(x,y)
+        the_sseq_class = PySseqClass(self,x,y)
         self.last_classes.appendleft(the_sseq_class)
         self.total_gens = self.total_gens + 1
         addToDictionaryOfLists(self.class_degree_dictionary, (x,y), the_sseq_class)
@@ -87,8 +90,6 @@ class Sseq(SpectralSequence):
             return
         differential = PyDifferential(sourceClass,targetClass,page)
         self.differentials.append(differential)
-        sourceClass.addOutgoingDifferential(differential)
-        targetClass.addIncomingDifferential(differential)
         if page not in self.page_list:
             self.addPageToPageList(page)
         return differential
@@ -110,6 +111,9 @@ class Sseq(SpectralSequence):
            else:
                 return []
             
+   def getCycles(self,p=None,page=1000):
+        return filter(lambda c: c.getPage()>page,self.getClasses(p) )
+        
 
    # Java interface methods below here.
    def getPageList(self):

@@ -21,10 +21,12 @@ bmax = 150
 vmin = -50
 vmax = 200
 
+sseq.setDefaultStyle('Zq')
+
 
 for v in range(vmin,vmax):
     for b in range(0,bmax):
-        s.set_shift(-26*b + 6*v,2*b)
+        s.set_shift(-26*b + 6*v,2*b) #s.set_shift(-26*b + 6*v,2*b)
         color = ['black', 'blue','green'][ v % 3 ]
         classes[(0,0,b,v)] = s.addClass(0,0).setName(monomialString(variables,(0,0,b,v))).setColor(color)
         classes[(1,0,b,v)] = s.addClass(3,1).setName(monomialString(variables,(1,0,b,v))).setColor(color)
@@ -43,7 +45,7 @@ for (k, v) in classes.items():
 for v in range(vmin,vmax-8):
     for (a2,b) in product([0,1],range(0,bmax-2)):
         if (v )%3 != 0:
-            s.addDifferential(classes[(0,a2,b,v)],classes[(1,a2,b+2,v+8)],5)
+            s.addDifferential(classes[(0,a2,b,v)],classes[(1,a2,b+2,v+8)],5).addInfoToSourceAndTarget()
 for (a1,a2,b,v) in product([0,1],[0,1],range(0,bmax),range(vmin/3*3+4,vmax,3)):
     if classes[(a1,a2,b,v)].getDegree()[1]>40:
         classes[(a1,a2,b,v)].setPage(5)
@@ -52,7 +54,10 @@ for (a1,a2,b,v) in product([0,1],[0,1],range(0,bmax),range(vmin/3*3+4,vmax,3)):
 # d9(a1 v^2) = d1 b^5 v^{24}
 for v in range((vmin)/3*3+2,vmax-22,3):
     for (a2,b) in product([0,1],range(0,bmax-5)):
-        s.addDifferential(classes[(1,a2,b,v)],classes[(0,a2,b+5,v+22)],9).replaceTarget("Z/d1")
+        d = s.addDifferential(classes[(1,a2,b,v)],classes[(0,a2,b+5,v+22)],9).replaceTarget("Z/q")
+        d.getSource().extra_info += str(d) + " delta1"s
+        d.getTarget().extra_info += str(d) + " delta1"s
+        classes[(0,a2,b+5,v+22)].setColor("red")
 
 for (a1,a2,b,v) in product([0,1],[0,1],range(0,bmax),range(vmin/3*3+5,vmax,3)):
     if classes[(a1,a2,b,v)].getDegree()[1]>40 and classes[(a1,a2,b,v)].getPage()>9:
@@ -60,23 +65,21 @@ for (a1,a2,b,v) in product([0,1],[0,1],range(0,bmax),range(vmin/3*3+5,vmax,3)):
 
         
 # d17(v^3) = a2 b^{16} Delta^{71}
-for v in range((vmin)/3*3+3,vmax-33,3):
-    if( (v ) % 9 != 0):
-        for b in range(0,bmax-16):
-            d = s.addDifferential(classes[(0,0,b,v)],classes[(0,1,b+8,v+33)],17)
-            d.getSource().extra_info = str(d)
-            d.getTarget().extra_info = str(d)
+for v in range((vmin)/3*3+15,vmax-33,3):
+    for b in range(0,bmax-8):
+        if( v % 9 != 0):
+            d = s.addDifferential(classes[(0,0,b,v)],classes[(0,1,b+8,v+33)],17).addInfoToSourceAndTarget()
+            if(d.getSource().getColor(0) != Color.RED):
+                d.replaceSource("qZq")
+            
 
 # d33(a2 v^6) = b^{17} Delta^{81}
-for v in range(vmin/3*3+3,vmax-75,9): 
+for v in range(vmin/9*9+6,vmax-75,9): 
     for b in range(0,bmax):
-        if( (v+3*b) % 9 != 0):
-            if (0,0,b+17,v+81-6) in classes and (0,1,b,v-3*b) in classes:
-                d = s.addDifferential(classes[(0,1,b,v-3*b)],classes[(0,0,b+17,v+81-6-3*b)],33)
-            else:
-                classes[(0,1,b,v)].setPage(33)
-            d.getSource().extra_info = str(d)
-            d.getTarget().extra_info = str(d)
+        if (0,0,b+17,v+81-6) in classes and (0,1,b,v) in classes:
+            d = s.addDifferential(classes[(0,1,b,v)],classes[(0,0,b+17,v+81-6)],33).addInfoToSourceAndTarget()
+        else:
+            classes[(0,1,b,v)].setPage(33)
             
 for (a1,a2,b,v) in product([0,1],[0,1],range(0,bmax),range(vmin/3*3+3,vmax,3)):
     if classes[(a1,a2,b,v)].getDegree()[1]>40 and classes[(a1,a2,b,v)].getPage()>33:
