@@ -6,8 +6,8 @@ sys.path.append(os.path.join('resolution', 'resolution.jar'))
 
 infinity = 10000
 
+from code import *
 from sseq_definition import *
-import code
 
 
 
@@ -21,6 +21,7 @@ def monomialString(vars, exponents):
         else:
             out[i] = vars[i] + "^" + str(exponents[i])
     return " ".join(filter(lambda s: s != "",out))
+
 
 def initialize(settings):
     global sseq 
@@ -52,11 +53,13 @@ else:
     settings.page_list = [0,5,9,17,33,65]
     sseq = initialize(settings)
 
-
-startDisplay()
+console1 = InteractiveConsole(locals=globals())
+sseq.setInterpreter(console1)
+console = InteractiveConsole(locals=globals())
+sseq.disp = startDisplay()
 
 def run_repl():
-    code.interact(local=globals()) 
+    console.interact() 
     sys.exit()
 
 run_repl()

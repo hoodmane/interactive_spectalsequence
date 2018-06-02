@@ -14,6 +14,18 @@ from res.spectralsequencediagram import *
 from java.awt import Color, Shape
 from java.awt.geom import Ellipse2D, Rectangle2D
 
+from contextlib import contextmanager
+# The important thing about cStringIO is that it "doesn't handle Unicode". Turns out StringIO doesn't handle normal strings...
+import cStringIO 
+
+@contextmanager
+def redirect_stdout(new_target):
+    old_target, sys.stdout = sys.stdout, new_target # replace sys.stdout
+    try:
+        yield new_target # run some code with the replaced stdout
+    finally:
+        sys.stdout = old_target # restore to the previous value
+
 infinity = 10000
 
 def addToDictionaryOfLists(dictionary, key,value):
@@ -36,6 +48,9 @@ class Sseq(SpectralSequence):
         self.last_classes = deque([],4)
         self.page_list = [0,infinity]
         self.default_style = PyStyle()
+   
+   def setInterpreter(self,interpreter):
+        self.interpreter = interpreter
    
    def setDefaultStyle(self,style):
         if type(style) is str:
@@ -142,3 +157,13 @@ class Sseq(SpectralSequence):
 
    def removeListener(self,l):
         return
+
+   # See https://stackoverflow.com/questions/22425453/redirect-output-from-stdin-using-code-module-in-python
+   # Ugh Python docs suck.
+   # So 
+   def executeJython(self, command, callback):
+        f = cStringIO.StringIO()
+        with redirect_stdout(f):    
+            if(not self.interpreter.push(command)):
+                callback.run(f.getvalue())
+            

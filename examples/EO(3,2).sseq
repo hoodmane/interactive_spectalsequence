@@ -55,8 +55,8 @@ for (a1,a2,b,v) in product([0,1],[0,1],range(0,bmax),range(vmin/3*3+4,vmax,3)):
 for v in range((vmin)/3*3+2,vmax-22,3):
     for (a2,b) in product([0,1],range(0,bmax-5)):
         d = s.addDifferential(classes[(1,a2,b,v)],classes[(0,a2,b+5,v+22)],9).replaceTarget("Z/q")
-        d.getSource().extra_info += str(d) + " delta1"s
-        d.getTarget().extra_info += str(d) + " delta1"s
+        d.getSource().addExtraInfo(str(d) + " delta1")
+        d.getTarget().addExtraInfo(str(d) + " delta1")
         classes[(0,a2,b+5,v+22)].setColor("red")
 
 for (a1,a2,b,v) in product([0,1],[0,1],range(0,bmax),range(vmin/3*3+5,vmax,3)):
