@@ -33,7 +33,7 @@ for v in range(vmin,vmax):
         #s.addStructline()
         classes[(0,1,b,v)] = s.addClass(9,1).setName(monomialString(variables,(0,1,b,v))).setColor(color)
         #s.addStructline(classes[(0,0,b,v)])
-        classes[(1,1,b,v)] = s.addClass(12,2).setName(monomialString(variables,(1,1,b,v))).setColor(color)
+        classes[(1,1,b,v)] = s.addClass(12,2).setName(  monomialString(variables,(1,1,b,v))).setColor(color)
         s.addStructlineSquare()
         
 for (k, v) in classes.items():
@@ -57,7 +57,6 @@ for v in range((vmin)/3*3+2,vmax-22,3):
         d = s.addDifferential(classes[(1,a2,b,v)],classes[(0,a2,b+5,v+22)],9).replaceTarget("Z/q")
         d.getSource().addExtraInfo(str(d) + " delta1")
         d.getTarget().addExtraInfo(str(d) + " delta1")
-        classes[(0,a2,b+5,v+22)].setColor("red")
 
 for (a1,a2,b,v) in product([0,1],[0,1],range(0,bmax),range(vmin/3*3+5,vmax,3)):
     if classes[(a1,a2,b,v)].getDegree()[1]>40 and classes[(a1,a2,b,v)].getPage()>9:

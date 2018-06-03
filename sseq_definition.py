@@ -4,12 +4,12 @@ from collections import deque
 sys.path.append("..\\resolution\\resolution.jar")
 sys.path.append(os.path.join('resolution', 'resolution.jar'))
 
-from style import *
 from sseq_class import *
 from sseq_edges import *
 
 from res.frontend import *
 from res.spectralsequencediagram import *
+from res.spectralsequencediagram.nodes import *
 
 from java.awt import Color, Shape
 from java.awt.geom import Ellipse2D, Rectangle2D
@@ -47,33 +47,33 @@ class Sseq(SpectralSequence):
         self.yshift = 0
         self.last_classes = deque([],4)
         self.page_list = [0,infinity]
-        self.default_style = PyStyle()
+        self.default_node = CircleNode()
    
-   def setInterpreter(self,interpreter):
+   def setInterpreter(self, interpreter):
         self.interpreter = interpreter
    
-   def setDefaultStyle(self,style):
-        if type(style) is str:
-            if style not in style_dict:
-                print("Unknown style %s, ignoring it")
-            style = style_dict[style]
-        self.default_style  = style
+   def setDefaultStyle(self, node):
+        if type(node) is str:
+            if node not in node_dict:
+                print("Unknown node type %s, ignoring it")
+            node = node_dict[node]
+        self.default_node  = node
         return self
    
-   def set_shift(self,x,y):
+   def set_shift(self, x, y):
         self.xshift = x
         self.yshift = y
         return self
    
-   def add_to_shift(self,x,y):
+   def add_to_shift(self, x, y):
         self.xshift += x
         self.yshift += y
         return self
 
-   def addClass(self,x,y):
+   def addClass(self, x, y):
         x = x + self.xshift
         y = y + self.yshift
-        the_sseq_class = PySseqClass(self,x,y)
+        the_sseq_class = PySseqClass(self, x, y)
         self.last_classes.appendleft(the_sseq_class)
         self.total_gens = self.total_gens + 1
         addToDictionaryOfLists(self.class_degree_dictionary, (x,y), the_sseq_class)
@@ -99,17 +99,17 @@ class Sseq(SpectralSequence):
         self.addStructline(self.last_classes[1],self.last_classes[3])
 
 
-   def addDifferential(self,sourceClass,targetClass,page):
+   def addDifferential(self, sourceClass, targetClass, page):
         if page <= 0:
             print("No page <= 0 differentials allowed.")
             return
-        differential = PyDifferential(sourceClass,targetClass,page)
+        differential = PyDifferential(sourceClass, targetClass, page)
         self.differentials.append(differential)
         if page not in self.page_list:
             self.addPageToPageList(page)
         return differential
         
-   def addPageToPageList(self,page):
+   def addPageToPageList(self, page):
         for i in range(0, len(self.page_list)):
             if(self.page_list[i] > page):
                 self.page_list.insert(i, page)
@@ -126,7 +126,7 @@ class Sseq(SpectralSequence):
            else:
                 return []
             
-   def getCycles(self,p=None,page=1000):
+   def getCycles(self, p=None, page=1000):
         return filter(lambda c: c.getPage()>page,self.getClasses(p) )
         
 
@@ -149,13 +149,13 @@ class Sseq(SpectralSequence):
    def getTMax(self):
         return 50
 
-   def getState(self,*args):
+   def getState(self, *args):
         return 4
 
-   def addListener(self,l):
+   def addListener(self, l):
         self.update_viewer = l.ping
 
-   def removeListener(self,l):
+   def removeListener(self, l):
         return
 
    # See https://stackoverflow.com/questions/22425453/redirect-output-from-stdin-using-code-module-in-python
