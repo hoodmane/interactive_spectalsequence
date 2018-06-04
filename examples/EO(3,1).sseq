@@ -8,32 +8,38 @@ settings.ymin = 0
 settings.ymax = 50
 settings.xgridstep = 5
 settings.ygridstep = 5
-settings.T_max = 100
+settings.T_max = 5000
 settings.x_full_range = True
 
 s = initialize(settings)
 
-classes = {}
-for v in range(-12,10):
-    for a in range(0,1+1):
-        for b in range(0,40):
-            classes[(a,b,v)] = s.addClass(24*v+3*a+10*b,a+2*b)#.setName( "v^" + str(v) + "e^" + str(e))
-    classes[(0,0,v)].setShape('Z')
+vmin = -12
+vmax = 10
+bmax = 40
 
-for v in range(-12,10):
-    for b in range(0,40):
+classes = s.addPolynomialClasses(
+    {   "a" : (3,1), "b" : (10,2),   "v" : (24,0) }, 
+      [["a", 0, 2], ["b", 0, bmax], ["v", vmin, vmax]])
+
+for v in range(vmin,vmax):
+    classes[(0,0,v)].setNode('Z')
+
+for v in range(vmin,vmax):
+    for b in range(0,bmax):
         s.addStructline(classes[(0,b,v)],classes[(1,b,v)])
 
-for v in range(-12,10):
-    for b in range(1,40):
+for v in range(vmin,vmax):
+    for b in range(1,bmax):
         for a in range(0,2):
             s.addStructline(classes[(a,b-1,v)],classes[(a,b,v)])
 
-for v in range(-11,10):
+for v in range(vmin,vmax):
     if v%3 != 0:
-        for b in range(0,38):
+        for b in range(0, bmax - 2):
             s.addDifferential(classes[(0,b,v)],classes[(1,b+2,v-1)],5)
+        classes[(0,0,v)].replace("pZ")
 
-for v in range(-10,10,3):
-    for b in range(0,34):
-        s.addDifferential(classes[(1,b,v)],classes[(0,b+5,v-2)],9)
+for v in range(vmin,vmax):
+    if v % 3 == 2:
+        for b in range(0, bmax - 5):
+            s.addDifferential(classes[(1,b,v)],classes[(0,b+5,v-2)],9)

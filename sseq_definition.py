@@ -17,6 +17,7 @@ from java.awt.geom import Ellipse2D, Rectangle2D
 from contextlib import contextmanager
 # The important thing about cStringIO is that it "doesn't handle Unicode". Turns out StringIO doesn't handle normal strings...
 import cStringIO 
+from itertools import product
 
 @contextmanager
 def redirect_stdout(new_target):
@@ -32,6 +33,20 @@ def addToDictionaryOfLists(dictionary, key,value):
     if key not in dictionary:
         dictionary[key] = []
     dictionary[key].append(value)
+    
+def monomialString(vars, exponents):
+    out = [None] * len(vars)
+    for i in range(0,len(vars)):
+        if(exponents[i]==0):
+            out[i] = ""
+        elif(exponents[i]==1):
+            out[i] = vars[i]
+        else:
+            out[i] = vars[i] + "^" + str(exponents[i])
+    outStr = " ".join(filter(lambda s: s != "",out))
+    if outStr == "":
+        outStr = "1"
+    return outStr
 
 class Sseq(SpectralSequence):
    def __init__(self):
@@ -121,6 +136,7 @@ class Sseq(SpectralSequence):
             return self.class_list
        elif len(args) == 1:
             p = args[0]
+            page = 1000
        elif len(args) == 2:
             p = args[0]
             page = args[1]
@@ -138,6 +154,33 @@ class Sseq(SpectralSequence):
    def getCycles(self, p=None, page=1000):
         return filter(lambda c: c.getPage()>page,self.getClasses(p) )
         
+   # Input:
+   #    var_degree_dict: a dictionary of the form varname : (stem_degree, filtration)
+   #    var_spec_list: a list of lists or tuples [varname, min, max, step].
+   # If step is missing, it defaults to 1, if min is missing it defaults to 0.
+   # Like python, max is max + 1.
+   def addPolynomialClasses(self,var_degree_dict,var_spec_list):
+        var_name_list = []
+        stem_list = []
+        filtration_list = []
+        range_list = [] 
+        class_dict = {}       
+        
+        for var_spec in var_spec_list:
+            var_name = var_spec[0]
+            var_name_list.append(var_name)
+            stem_list.append(var_degree_dict[var_name][0])
+            filtration_list.append(var_degree_dict[var_name][1])
+            range_list.append(range(*var_spec[1:]))
+            
+        for monomial_exponents in product(*range_list):
+            stem = sum(p*q for p,q in zip(monomial_exponents, stem_list))
+            filtration = sum(p*q for p,q in zip(monomial_exponents, filtration_list))
+            name = monomialString(var_name_list,monomial_exponents)
+            class_dict[monomial_exponents] = self.addClass(stem,filtration).setName(name)
+        return class_dict
+        
+   # 
 
    # Java interface methods below here.
    def getPageList(self):
@@ -169,7 +212,9 @@ class Sseq(SpectralSequence):
 
    # See https://stackoverflow.com/questions/22425453/redirect-output-from-stdin-using-code-module-in-python
    # Ugh Python docs suck.
-   # So 
+   # So at some point they changed io.StringIO so that it will ONLY accept unicode strings.
+   # Unfortunately, the interpreter writes ascii to stdout, and then StringIO gets mad because it's not unicode.
+   # This is retarded. Anyways cStringIO accepts ascii.
    def executeJython(self, command, callback):
         f = cStringIO.StringIO()
         with redirect_stdout(f):    

@@ -11,18 +11,6 @@ from sseq_definition import *
 
 
 
-def monomialString(vars, exponents):
-    out = [None] * len(vars)
-    for i in range(0,len(vars)):
-        if(exponents[i]==0):
-            out[i] = ""
-        elif(exponents[i]==1):
-            out[i] = vars[i]
-        else:
-            out[i] = vars[i] + "^" + str(exponents[i])
-    return " ".join(filter(lambda s: s != "",out))
-
-
 def initialize(settings):
     global sseq 
     global startDisplay 

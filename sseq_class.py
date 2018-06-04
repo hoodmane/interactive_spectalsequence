@@ -104,8 +104,6 @@ class PySseqClass(SseqClass):
         self.class_name = name
         return self
 
-    # Do we need a variant of getStyle that returns a copy?
-    # It's a bit annoying that Styles are mutable, but making them immutable would be more annoying
     def getNode(self, page = 1000):
         idx = self.getPageIndex(page)
         if idx < len(self.node_list):
@@ -114,7 +112,14 @@ class PySseqClass(SseqClass):
         return self.node_list[-1]
 
     def setNode(self, node, page = 1000):
-        self.node = copy.copy(node)
+        if type(node) is str:
+            node = node_dict[node].copy()
+        idx = self.getPageIndex(page)        
+        if idx < len(self.node_list):
+            self.node_list[idx] = node.copy()
+        else:
+            self.node_list[-1] = node.copy()
+        return self
 
     def getColor(self, page=1000):
         return self.getNode(page).getColor()
