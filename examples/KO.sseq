@@ -5,13 +5,11 @@ s = initialize(settings)
 
 
 classes = s.addPolynomialClasses({ "v" : (4,0), "e" : (1,1)}, [["e", 0,51], ["v", -10,11]])
+classes.addStructline(1,0)
+classes.addDifferential(3, (3,-1), lambda k : k[1] % 2 == 1, lambda d : d.addInfoToSourceAndTarget())
 
 for v in range(-10,11):
     classes[(0,v)].setNode('Z')
-    for e in range(1,50):
-        s.addStructline(classes[(e-1,v)],classes[(e,v)])
 
 for v in range(-9,10,2):
-    for e in range(0,40):
-        s.addDifferential(classes[(e,v)],classes[(e+3,v-1)],3)
     classes[(0, v)].replace('2Z')

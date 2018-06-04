@@ -24,22 +24,13 @@ classes = s.addPolynomialClasses(
 for v in range(vmin,vmax):
     classes[(0,0,v)].setNode('Z')
 
-for v in range(vmin,vmax):
-    for b in range(0,bmax):
-        s.addStructline(classes[(0,b,v)],classes[(1,b,v)])
+classes.addStructline(1,0,0)
+classes.addStructline(0,1,0)
+
+classes.addDifferential(5, (1,2,-1), lambda k : k[-1] % 3 != 0)
+classes.addDifferential(5, (1,2,-1), lambda k : k[-1] % 3 == 2 and k[0] == 1)
 
 for v in range(vmin,vmax):
-    for b in range(1,bmax):
-        for a in range(0,2):
-            s.addStructline(classes[(a,b-1,v)],classes[(a,b,v)])
-
-for v in range(vmin,vmax):
-    if v%3 != 0:
-        for b in range(0, bmax - 2):
-            s.addDifferential(classes[(0,b,v)],classes[(1,b+2,v-1)],5)
+    if v % 3 != 0:
         classes[(0,0,v)].replace("pZ")
 
-for v in range(vmin,vmax):
-    if v % 3 == 2:
-        for b in range(0, bmax - 5):
-            s.addDifferential(classes[(1,b,v)],classes[(0,b+5,v-2)],9)

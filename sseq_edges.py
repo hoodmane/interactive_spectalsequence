@@ -4,24 +4,24 @@ infinity = 10000
 from java.awt import Color, Shape
 
 class PySseqStructline(Structline):
-    def __init__(self, sourceClass, targetClass):
-        self.sourceClass = sourceClass
-        self.targetClass = targetClass
-        self.thepage = 0
+    def __init__(self, source_class, target_class):
+        self.source_class = source_class
+        self.target_class = target_class
+        self.the_page = 0
 
     # Java Methods:
     def getSource(self):
-        return self.sourceClass
+        return self.source_class
 
     def getTarget(self):
-        return self.targetClass
+        return self.target_class
 
     def setPage(self, newPage):
-        self.thepage = newPage
+        self.the_page = newPage
         return self
 
     def getPage(self):
-        return self.thepage
+        return self.the_page
 
     def getShape(self, page):
         return
@@ -32,20 +32,22 @@ class PySseqStructline(Structline):
         
         
 class PyDifferential(Differential):
-    def __init__(self, sourceClass, targetClass, page):
-        self.sourceClass = sourceClass
-        self.targetClass = targetClass
-        self.thepage = page
+    def __init__(self, source_class, target_class, page):
+        self.source_class = source_class
+        self.target_class = target_class
+        self.the_page = page
         self.color = Color.BLUE
-        sourceClass.addOutgoingDifferential(self)
-        targetClass.addIncomingDifferential(self)
+        source_class.addOutgoingDifferential(self)
+        target_class.addIncomingDifferential(self)
+        self.sourceName = str(self.source_class)
+        self.targetName = str(self.target_class)
 
     def setKernel(self, nodeStyle):
-        self.sourceClass.replace(nodeStyle)
+        self.source_class.replace(nodeStyle)
         return self
 
     def setCokernel(self, nodeStyle):
-        self.targetClass.replace(nodeStyle)
+        self.target_class.replace(nodeStyle)
         return self
 
     def replaceSource(self, nodeStyle):
@@ -55,33 +57,41 @@ class PyDifferential(Differential):
     def replaceTarget(self, nodeStyle):
         self.setCokernel(nodeStyle)
         return self
+        
+    def setSourceName(self, name):
+        self.source_name = name
+        return self
+    
+    def setTargetName(self, name):
+        self.target_name = name
+        return self
 
     def hitMessage(self):
-        return "hit on page %d by class %r" % (self.page, self.sourceClass)
+        return "hit on page %d by class %r" % (self.page, self.source_class)
 
     def supportedMessage(self):
-        return "supported a differential on page %d hitting class %r" % (self.page, self.targetClass)
+        return "supported a differential on page %d hitting class %r" % (self.page, self.target_class)
 
     def addInfoToSourceAndTarget(self):
-        self.sourceClass.addExtraInfo(str(self))
-        self.targetClass.addExtraInfo(str(self))
+        self.source_class.addExtraInfo(str(self))
+        self.target_class.addExtraInfo(str(self))
         return self
 
     # Java methods:
     def getSource(self):
-        return self.sourceClass
+        return self.source_class
 
     def getTarget(self):
-        return self.targetClass
+        return self.target_class
 
     def getPage(self):
-        return self.thepage
+        return self.the_page
 
     def getColor(self, page):
         return self.color
 
     def toString(self):
-        return "d_{%d}( %s ) = %s" % (self.thepage,self.sourceClass,self.targetClass)
+        return "d_{%d}( %s ) = %s" % (self.the_page,self.source_class,self.target_class)
 
 
 

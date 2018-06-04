@@ -164,7 +164,7 @@ class Sseq(SpectralSequence):
         stem_list = []
         filtration_list = []
         range_list = [] 
-        class_dict = {}       
+        class_dict = monomial_basis(self)
         
         for var_spec in var_spec_list:
             var_name = var_spec[0]
@@ -177,7 +177,7 @@ class Sseq(SpectralSequence):
             stem = sum(p*q for p,q in zip(monomial_exponents, stem_list))
             filtration = sum(p*q for p,q in zip(monomial_exponents, filtration_list))
             name = monomialString(var_name_list,monomial_exponents)
-            class_dict[monomial_exponents] = self.addClass(stem,filtration).setName(name)
+            class_dict._add_class(monomial_exponents, name, self.addClass(stem,filtration).setName(name))
         return class_dict
         
    # 
@@ -220,4 +220,88 @@ class Sseq(SpectralSequence):
         with redirect_stdout(f):    
             if(not self.interpreter.push(command)):
                 callback.run(f.getvalue())
+
+
+# tuples but + means add elementwise and * means multiply by scalar.
+# Note: multiplying on the left by an integer does the wrong thing...
+class vector_tuple(tuple):
+    def __new__(cls, *args):
+        return tuple.__new__(cls, args)
+    
+    def __add__(self, other):
+        return vector_tuple(*([sum(x) for x in zip(self, other)]))
+    
+    def __sub__(self, other):
+        return self.__add__(-i for i in other)
+    
+    def __mul__(self, n):
+        return vector_tuple(*[n*x for x in self])
+                
+   
+class monomial_basis:
+    
+    def __init__(self,sseq):
+        self.sseq = sseq
+        self._tuples_to_classes = {}
+        self._strings_to_classes = {}
+        self._tuples_to_strings = {}
+        
+    def _add_class(self, tuple, name, the_class):
+        tuple = vector_tuple(*tuple)
+        self._tuples_to_classes[tuple] = the_class
+        self._strings_to_classes[name] = the_class
+        self._tuples_to_strings[tuple] = name
+    
+    def addStructline(self, *vect):
+        vect = vector_tuple(*vect)
+        for k in self.keys():
+            if k + vect in self:
+                self.sseq.addStructline(self[k], self[k + vect])
+                
+    def addDifferential(self, page, target_vect, cond, callback = None):
+        target_vect = vector_tuple(*target_vect)
+        for k in self.keys():
+            if cond(k):
+                if k + target_vect in self:
+                    d = self.sseq.addDifferential(self[k], self[k + target_vect], page)
+                    if callback:
+                        callback(d)
+                else:
+                    if self[k].getPage()> page:
+                        self[k].setPage(page)
+    
+    # standard immutable dictionary methods:        
+    def __getitem__(self, key): 
+        if key in self._tuples_to_classes:
+            return self._tuples_to_classes[key]
+        if key in self._strings_to_classes:
+            return self._strings_to_classes[key]        
+        raise KeyError()
+        
+    def __len__(self):
+        return len(_tuples_to_classes)
+    
+    def __iter__(self):
+        return iter(self._tuples_to_classes)
+    
+    def __contains__(self, item):
+        return (item in self._tuples_to_classes) or (item in self._strings_to_classes)
+    
+    def keys(self): 
+        return self._tuples_to_classes.keys()
+        
+    def values(self):
+        return self._tuples_to_classes.values()
+        
+    def items(self):
+        return [(tup, self._tuples_to_strings[tup], self._tuples_to_classes[tup]) for tup in self._tuples_to_classes.keys()]
+    
+    def get(self, key, default_value = None):
+        if key in self._tuples_to_classes:
+            return self._tuples_to_classes[key]
+        if key in self._strings_to_classes:
+            return self._strings_to_classes[key]        
+        return default_value         
+    
+    
             

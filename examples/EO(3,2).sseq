@@ -27,25 +27,22 @@ classes = s.addPolynomialClasses(
     {  "h1" : (3,1),  "a2" : (9,1), "b" : (-26,2),  "v" : (6,0) }, 
       [["h1", 0, 2], ["a2", 0, 2], ["b", 0, bmax], ["v", vmin, vmax]])
 
-for k, c in classes.items():
+for k, _, c in classes.items():
     c.setColor(['black', 'blue','green'][ k[-1] % 3 ])
     c.key = k
 
-for (b, v) in product(range(0,bmax), range(vmin,vmax)):
-    s.addStructline(classes[(0,0,b,v)],classes[(0,1,b,v)])
-    s.addStructline(classes[(0,0,b,v)],classes[(1,0,b,v)])
-    s.addStructline(classes[(1,0,b,v)],classes[(1,1,b,v)])
-    s.addStructline(classes[(0,1,b,v)],classes[(1,1,b,v)])
+classes.addStructline(1,0,0,0)
+classes.addStructline(0,1,0,0)
 
 
 # d5(v) = a1 b^2 v^{9}
-for v in range(vmin,vmax-8):
-    for (a2,b) in product([0,1],range(0,bmax-2)):
-        if (v )%3 != 0:
-            s.addDifferential(classes[(0,a2,b,v)],classes[(1,a2,b+2,v+8)],5).addInfoToSourceAndTarget()
-for (a1,a2,b,v) in product([0,1],[0,1],range(0,bmax),range(vmin/3*3+4,vmax,3)):
-    if classes[(a1,a2,b,v)].getDegree()[1]>40:
-        classes[(a1,a2,b,v)].setPage(5)
+classes.addDifferential(5, (1,0,2,8), lambda k: k[-1] % 3 != 0, lambda d : d.addInfoToSourceAndTarget())
+
+#def d9_callback(d):
+#    d.getS
+
+#classes.addDifferential(9, (0,1,5,22), lambda k: k[-1] % 3 == 2, 
+#    lambda d : d.setTargetName(d.getSource()).addInfoToSourceAndTarget())
 
 
 # d9(a1 v^2) = d1 b^5 v^{24}
@@ -59,7 +56,14 @@ for (a1,a2,b,v) in product([0,1],[0,1],range(0,bmax),range(vmin/3*3+5,vmax,3)):
     if classes[(a1,a2,b,v)].getDegree()[1]>40 and classes[(a1,a2,b,v)].getPage()>9:
         classes[(a1,a2,b,v)].setPage(9)        
 
-        
+
+#def d17_callback(d):
+#    d.addInfoToSourceAndTarget()
+#    if(len(d.getSource().incoming_differentials) == 0):
+#        d.replaceSource("qZq")    
+#
+#classes.addDifferential(17, (0,1,8,33), lambda k: k[0] == 0 and k[-1] % 9 != 0, d17_callback)        
+
 # d17(v^3) = a2 b^{16} Delta^{71}
 for v in range((vmin)/3*3+15,vmax-33,3):
     for b in range(0,bmax-8):
