@@ -68,7 +68,7 @@ for v in range((vmin)/3*3+15,vmax-33,3):
     for b in range(0,bmax-8):
         if( v % 9 != 0):
             d = s.addDifferential(classes[(0,0,b,v)],classes[(0,1,b+8,v+33)],17).addInfoToSourceAndTarget()
-            if(d.getSource().getColor(0) != Color.RED):
+            if(len(d.getSource().incoming_differentials) == 0):
                 d.replaceSource("qZq")
             
 
@@ -77,6 +77,8 @@ for v in range(vmin/9*9+6,vmax-75,9):
     for b in range(0,bmax):
         if (0,0,b+17,v+81-6) in classes and (0,1,b,v) in classes:
             d = s.addDifferential(classes[(0,1,b,v)],classes[(0,0,b+17,v+81-6)],33).addInfoToSourceAndTarget()
+            if(len(d.getSource().incoming_differentials) == 0):
+                d.replaceSource("qZq")
         else:
             classes[(0,1,b,v)].setPage(33)
             

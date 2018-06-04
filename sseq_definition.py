@@ -116,15 +116,24 @@ class Sseq(SpectralSequence):
                 break
 
 
-   def getClasses(self, p=None, page=None):
-       if p == None:
-           return self.class_list
+   def getClasses(self, *args):
+       if len(args) == 0:
+            return self.class_list
+       elif len(args) == 1:
+            p = args[0]
+       elif len(args) == 2:
+            p = args[0]
+            page = args[1]
+       elif len(args) == 3:
+            p = (args[0], args[1])
+            page = args[2]
        else:
-           q = (p[1] - p[0], p[0])
-           if q in self.class_degree_dictionary:
-                return filter(lambda c: c.visible, self.class_degree_dictionary[q])
-           else:
-                return []
+            print("Too many arguments")
+            return
+       if p in self.class_degree_dictionary:
+            return filter(lambda c: c.visible, self.class_degree_dictionary[p])
+       else:
+            return []
             
    def getCycles(self, p=None, page=1000):
         return filter(lambda c: c.getPage()>page,self.getClasses(p) )
